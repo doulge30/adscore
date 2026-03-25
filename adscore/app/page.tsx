@@ -235,10 +235,10 @@ export default function Home() {
             if (evt.text) {
               fullText += evt.text
               // Progressive parse
-              const regex = /\{"name":"([^"]+)","score":(\d+),"status":"([^"]+)","feedback":"([^"]+)"\}/g
-const matches: RegExpExecArray[] = []
-let match
-while ((match = regex.exec(fullText)) !== null) matches.push(match)
+              const criteriaRegex = /\{"name":"([^"]+)","score":(\d+),"status":"([^"]+)","feedback":"([^"]+)"\}/g
+              const matches: RegExpExecArray[] = []
+              let rm: RegExpExecArray | null
+              while ((rm = criteriaRegex.exec(fullText)) !== null) matches.push(rm)
               while (shownCriteria < matches.length) {
                 const m = matches[shownCriteria]
                 const c: Criterion = { name: m[1], score: parseInt(m[2]), status: m[3] as Criterion['status'], feedback: m[4] }
