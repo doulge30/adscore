@@ -183,8 +183,23 @@ export default function Home() {
     setShowImages(false); setPhase('analyzing')
     setProgress(5); setProgressMsg('Compressing image...')
 
+    // Compress to max 800px
+    const compressed = await new Promise<Blob>((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        const MAX = 800, c = document.createElement('canvas')
+        let w = img.width, h = img.height
+        if (w > MAX || h > MAX) { w > h ? (h = Math.round(h * MAX / w), w = MAX) : (w = Math.round(w * MAX / h), h = MAX) }
+        c.width = w; c.height = h
+        c.getContext('2d')!.drawImage(img, 0, 0, w, h)
+        c.toBlob(b => b ? resolve(b) : reject(new Error('Compression failed')), 'image/jpeg', 0.80)
+      }
+      img.onerror = () => reject(new Error('Image load failed'))
+      img.src = previewUrl
+    })
+
     const form = new FormData()
-    form.append('file', file, file.name)
+    form.append('file', compressed, 'creative.jpg')
     form.append('placement', PLACEMENT_LABELS[placement])
     form.append('industry', (document.getElementById('industry') as HTMLInputElement)?.value || 'N/A')
     form.append('audience', (document.getElementById('audience') as HTMLInputElement)?.value || 'N/A')
